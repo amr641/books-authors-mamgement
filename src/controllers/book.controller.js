@@ -10,8 +10,12 @@ const addBook = async (req, res) => {
 };
 const getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find().limit(req.query.limit).skip(req.query.skip);
-    res.status(200).json(books);
+    let page = req.query.page;
+    let limit = 10;
+    let offset = (page - 1) * limit;
+    const books = await Book.find().skip(offset).limit(limit);
+    if (books.length) return res.status(200).json(books);
+    res.status(409).json({ message: "no more books" });
   } catch (error) {
     res.json(error);
   }

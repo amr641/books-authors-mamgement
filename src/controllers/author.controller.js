@@ -10,11 +10,14 @@ const addAuthor = async (req, res) => {
 };
 const getAllAuthors = async (req, res) => {
   try {
+    let page = req.query.page;
+    let limit = 10;
+    let offset = (page - 1) * limit;
     const authors = await Author.find({}, { __v: 0, _id: 0 })
-      .populate("books", " -__v -_id")
-      .limit(req.query.limit)
-      .skip(req.query.skip);
-    res.status(200).json(authors);
+      .limit(limit)
+      .skip(offset);
+    if (authors.length) return res.status(200).json(authors);
+    res.status(409).json({ message: "no more authors" });
   } catch (error) {
     res.json(error);
   }
